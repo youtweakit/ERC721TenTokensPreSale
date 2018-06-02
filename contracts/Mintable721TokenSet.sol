@@ -9,7 +9,7 @@ import "./SafeMath.sol";
 /** 
 * @author Alex_Edwards youtweakit @ github
 * based on klivin @ github Crowdsale721 smart contracts (github.com/klivin/721Crowdsale) and
-* OpenZeppelin ERC721 standsrt implementation
+* OpenZeppelin ERC721 standart implementation
 */
 
 contract Mintable721TokenSet is ERC721Token, MintingUtility {
