@@ -147,6 +147,6 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     */
     function _generateTenRandomRnas (string _holderName) private view returns(uint) { 
 
-        return uint256((kessak256(QuickSort.sortAndVerifyUnique(_holderName))) % rnaDivider);
+        return uint((kessak256(QuickSort.sortAndVerifyUnique(_holderName))) % rnaDivider);
     }
 }
