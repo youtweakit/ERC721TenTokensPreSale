@@ -6,17 +6,13 @@ import "./MintingUtility.sol";
 import "./ERC721Token.sol";
 import "./SafeMath.sol";
 
-/** 
-* @author Alex_Edwards youtweakit @ github
-* based on klivin @ github Crowdsale721 smart contracts (github.com/klivin/721Crowdsale) and
-* OpenZeppelin ERC721 standart implementation
-*/
 
 contract Mintable721TokenSet is ERC721Token, MintingUtility {
 
     using SafeMath for uint256;
 
-    event NewPreSaleNft (address ownerAddress, string nftSetName);
+    event NewPreSaleAdded (address indexed ownerAddress, string nftSetName);
+    event NewNftTokenAdded (string nftSetName, uint64[] rna);
 
     uint public rnaDigits = 18;
     uint public rnaDivider = 10**rnaDigits;
@@ -37,7 +33,7 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     function mint (
 
     address _beneficiary,
-    uint64[10] _tokenIds
+    uint64 _tokenIds
 
     )
 
@@ -47,7 +43,7 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
 {
         require(nftSetCounter[msg.sender] == 0);
         // This will assign ownership, and also emit the Transfer event
-        _mint(_beneficiary, _tokenId); 
+        _mint(_beneficiary, _tokenIds); 
     }
 
   /*
@@ -69,12 +65,12 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
 
     address _from,
     address _to, 
-    uint64[10] _tokenIds
+    uint64 _tokenIds
 ) 
     whenNotPaused 
     public 
 {
-        for (uint i = 0; i = 10; i++) {
+        for (uint i = 0; i <= _tokenIds.length; i++) {
             require(isApprovedFor(msg.sender, _tokenIds[i]));
             clearApprovalAndTransfer(_from, _to, _tokenIds[i]);
         }
@@ -95,7 +91,7 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     whenNotPaused 
     public 
 {
-        for (uint i = 0; i = 10; i++) {
+        for (uint i = 0; i <= _tokenIds.length; i++) {
             approve(_to, _tokenIds[i]);
         }
     }
@@ -114,7 +110,7 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     constant 
     returns (bool) 
 {
-        for (uint i = 0; i = 10; i++) {
+        for (uint i = 0; i <= _tokenIds.length; i++) {
             if (ownerOf(_tokenIds[i]) != _owner) {
                 return false;
             }
@@ -134,12 +130,13 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
             uint id = preSaleSets.push(NftSet(_startupName, rna[i])) - 1;
             nftSetOwner[id] = _startupOwner;
             _mint(_starupOwner, rna[i]);
-            nftSetPerName(_startupName, rna[i]);
+            nftSetPerName.push(_startupName, rna[i]);
+            NewNftTokenAdded(_startupName, rna[i]);
 
         }
         nftSetCounter[_startupOwner]++;
-        nftSetNameOwner[_startupOwner] = _startupName;
-        NewPreSaleNft(_startupOwner, _startupName);
+        nftSetNameOwner[_startupOwner].push(_startupName);
+        NewPreSaleAdded(_startupOwner, _startupName);
     };
 
     /* 
@@ -147,6 +144,6 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     */
     function _generateTenRandomRnas (string _holderName) private view returns(uint) { 
 
-        return uint((kessak256(QuickSort.sortAndVerifyUnique(_holderName))) % rnaDivider);
+        return uint256((kessak256(QuickSort.sortAndVerifyUnique(_holderName))) % rnaDivider);
     }
 }
