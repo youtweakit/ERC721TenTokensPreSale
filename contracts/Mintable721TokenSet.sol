@@ -1,4 +1,5 @@
 pragma solidity ^0.4.19;
+pragma experimental ABIEncoderV2;
 
 import "./Pausable.sol";
 import "./QuickSort.sol";
@@ -6,21 +7,18 @@ import "./MintingUtility.sol";
 import "./ERC721Token.sol";
 import "./SafeMath.sol";
 
-
 contract Mintable721TokenSet is ERC721Token, MintingUtility {
 
     using SafeMath for uint256;
 
     event NewPreSaleAdded (address indexed ownerAddress, string nftSetName);
-    event NewNftTokenAdded (string nftSetName, uint64[] rna);
+    event NewNftTokenAdded (string nftSetName, uint[] rna);
 
-    uint public rnaDigits = 18;
-    uint public rnaDivider = 10**rnaDigits;
 
     struct NftSet {
 
         string startupName;
-        uint64[10] rna;
+        uint[10] rna;
     } 
 
     NftSet[] public preSaleSets;
@@ -28,8 +26,18 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     mapping (uint => address) public nftSetOwner;
     mapping (address => uint) public nftSetCounter;
     mapping (address => string) public nftSetNameOwner;
-    mapping (string => uint64[10]) public nftSetPerName;
+    mapping (string => uint[10]) public nftSetPerName;
     
+    function createTokennSet(address Owner, string startupName, string[10] holdersName) public {
+        for (uint i = 1; i < 10; i++) {
+        uint rna = _generateRandomTokenId(holdersName[i]);
+        _createTokenSet(Owner, rna);
+        NewNftTokenAdded(startupName, rna);
+        }
+        nftSetCounter[Owner]++;
+        nftSetNameOwner[Owner].push(startupName);
+        NewPreSaleAdded(Owner, startupName);
+    }
     function mint (
 
     address _beneficiary,
@@ -65,14 +73,15 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
 
     address _from,
     address _to, 
-    uint64 _tokenIds
+    uint64[] _tokenIds
 ) 
     whenNotPaused 
     public 
 {
-        for (uint i = 0; i <= _tokenIds.length; i++) {
-            require(isApprovedFor(msg.sender, _tokenIds[i]));
-            clearApprovalAndTransfer(_from, _to, _tokenIds[i]);
+        for (uint i = 0; i < 10; i++) {
+            require(isApprovedOrOwner(msg.sender, _tokenIds[i]));
+            clearApproval(_from, _tokenIds[i]);
+            transferFrom(_from, _to, _tokenIds[i]);
         }
     }
 
@@ -122,28 +131,19 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     @dev creates a set of 10 unique NFT tokens, mapps them by startup name and rnas
     @dev awakes NewPreSaleNft event for frontend 
     */
-    function _createTokenSet(address _startupOwner, string _startupName, string[10] _holders) internal {
+    function _createTokenSet(address _startupOwner, uint rna) internal {
 
-        require(_startupOwner = msg.sender);
-        for (i = 1; i = 10; i++) {
-            uint64 rna = _generateTenRandomRnas(_holders[i]);
-            uint id = preSaleSets.push(NftSet(_startupName, rna[i])) - 1;
-            nftSetOwner[id] = _startupOwner;
-            _mint(_starupOwner, rna[i]);
-            nftSetPerName.push(_startupName, rna[i]);
-            NewNftTokenAdded(_startupName, rna[i]);
-
-        }
-        nftSetCounter[_startupOwner]++;
-        nftSetNameOwner[_startupOwner].push(_startupName);
-        NewPreSaleAdded(_startupOwner, _startupName);
+        onlyOwner;
+        
+            _mint(_startupOwner, rna);
+            
     }
 
     /* 
     @dev generates a unique identifier for each token in a set from provided NFT token holder's names
     */
-    function _generateTenRandomRnas (string _holderName) private view returns(uint) { 
+    function _generateRandomTokenId (string _holderName) private view returns(uint) { 
 
-        return uint256((kessak256(QuickSort.sortAndVerifyUnique(_holderName))) % rnaDivider);
+        return uint256(keccak256(QuickSort.sortAndVerifyUnique(_holderName)));
     }
 }
