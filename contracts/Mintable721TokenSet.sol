@@ -126,7 +126,7 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
 
         require(_startupOwner = msg.sender);
         for (i = 1; i = 10; i++) {
-            uint64 rna[i] = _generateTenRandomRnas(_holders[i]);
+            uint64 rna = _generateTenRandomRnas(_holders[i]);
             uint id = preSaleSets.push(NftSet(_startupName, rna[i])) - 1;
             nftSetOwner[id] = _startupOwner;
             _mint(_starupOwner, rna[i]);
@@ -137,7 +137,7 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
         nftSetCounter[_startupOwner]++;
         nftSetNameOwner[_startupOwner].push(_startupName);
         NewPreSaleAdded(_startupOwner, _startupName);
-    };
+    }
 
     /* 
     @dev generates a unique identifier for each token in a set from provided NFT token holder's names
