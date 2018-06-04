@@ -12,7 +12,7 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     using SafeMath for uint256;
 
     event NewPreSaleAdded (address indexed ownerAddress, string nftSetName);
-    event NewNftTokenAdded (string nftSetName, uint[] rna);
+    event NewNftTokenAdded (string nftSetName, uint rna);
 
 
     struct NftSet {
@@ -29,14 +29,15 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     mapping (string => uint[10]) public nftSetPerName;
     
     function createTokennSet(address Owner, string startupName, string[10] holdersName) public {
+        //NftSet.push(nftSetNameOwner[Owner]((startupName)));
         for (uint i = 1; i < 10; i++) {
         uint rna = _generateRandomTokenId(holdersName[i]);
         _createTokenSet(Owner, rna);
-        NewNftTokenAdded(startupName, rna);
+        emit NewNftTokenAdded(startupName, rna);
         }
         nftSetCounter[Owner]++;
-        nftSetNameOwner[Owner].push(startupName);
-        NewPreSaleAdded(Owner, startupName);
+        
+       emit  NewPreSaleAdded(Owner, startupName);
     }
     function mint (
 
@@ -142,8 +143,8 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     /* 
     @dev generates a unique identifier for each token in a set from provided NFT token holder's names
     */
-    function _generateRandomTokenId (string _holderName) private view returns(uint) { 
+    function _generateRandomTokenId (string _holderName) private pure returns(uint) { 
 
-        return uint256(keccak256(QuickSort.sortAndVerifyUnique(_holderName)));
+        return uint256(keccak256(_holderName));
     }
 }
