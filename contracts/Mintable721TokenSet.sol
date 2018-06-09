@@ -31,7 +31,7 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     function createTokenSet(address Owner, string startupName, string[10] holdersName) public {
         for (uint i = 1; i < 10; i++) {
         uint rna = _generateRandomTokenId(holdersName[i]);
-        preSaleSets.push(NftPresale(startupName, rna[i]);
+        preSaleSets.push(NftPresale(startupName, rna);
         _createTokenSet(Owner, rna);
         emit NewNftTokenAdded(startupName, rna);
         }
