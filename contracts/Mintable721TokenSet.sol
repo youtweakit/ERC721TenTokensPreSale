@@ -15,13 +15,13 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     event NewNftTokenAdded (string nftSetName, uint rna);
 
 
-    struct NftSet {
+    struct NftPresale {
 
         string startupName;
-        uint[10] rna;
+        uint[10] tokenRna;
     } 
 
-    NftSet[] public preSaleSets;
+    NftPresale[] public preSaleSets;
 
     mapping (uint => address) public nftSetOwner;
     mapping (address => uint) public nftSetCounter;
@@ -29,15 +29,15 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     mapping (string => uint[10]) public nftSetPerName;
     
     function createTokenSet(address Owner, string startupName, string[10] holdersName) public {
-        //NftSet.push(nftSetNameOwner[Owner]((startupName)));
         for (uint i = 1; i < 10; i++) {
         uint rna = _generateRandomTokenId(holdersName[i]);
+        preSaleSets.push(NftPresale(startupName, rna[i]);
         _createTokenSet(Owner, rna);
         emit NewNftTokenAdded(startupName, rna);
         }
         nftSetCounter[Owner]++;
         
-       emit  NewPreSaleAdded(Owner, startupName);
+        emit  NewPreSaleAdded(Owner, startupName);
     }
     function mint (
 
@@ -96,7 +96,7 @@ contract Mintable721TokenSet is ERC721Token, MintingUtility {
     function approveMany(
 
     address _to,
-    uint64[10] _tokenIds
+    uint64[] _tokenIds
 ) 
     whenNotPaused 
     public 
